@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environment
+backend/venv/
+venv/
+.env.local
+.env.*
+!.env.example
+
+# Secrets
+backend/.env
+
+# Backend runtime storage (screenshots, vector index, sqlite)
+backend/storage/screenshots/
+backend/storage/chroma/
+backend/storage/memory.db
+backend/*.db
+backend/chroma_data/
+
+# Scanner artifacts
+backend/nuclei-templates/
+backend/data/wordlists/
+*.log
+
+# Node / frontend
+node_modules/
+frontend/dist/
+frontend/.vite/
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp

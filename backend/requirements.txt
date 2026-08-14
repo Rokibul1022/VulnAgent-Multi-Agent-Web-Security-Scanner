@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+httpx
+pydantic
+python-dotenv
+sse-starlette
+beautifulsoup4
+groq
+chromadb
+python-multipart

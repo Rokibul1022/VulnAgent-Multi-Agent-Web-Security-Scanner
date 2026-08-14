@@ -1,0 +1,8 @@
+.env
+venv/
+__pycache__/
+*.pyc
+chroma_data/
+nuclei-templates/
+*.db
+.DS_Store
