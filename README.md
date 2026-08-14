@@ -287,7 +287,6 @@ Environment variables (backend `.env`):
 │   │   ├── App.jsx
 │   │   └── index.css
 │   └── package.json
-├── agent.md               # project spec & milestone plan
 └── .gitignore
 ```
 
