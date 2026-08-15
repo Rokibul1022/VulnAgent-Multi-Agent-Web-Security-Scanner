@@ -45,7 +45,7 @@ const CATALOG = [
   {
     stage: 'triage',
     label: 'Triage',
-    agents: [['triage', 'Groq LLM']],
+    agents: [['triage', 'LLM']],
   },
   {
     stage: 'report',

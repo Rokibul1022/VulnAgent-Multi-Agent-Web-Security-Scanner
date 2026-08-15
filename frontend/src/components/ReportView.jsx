@@ -1,6 +1,9 @@
 import { groupFindings } from '../lib/severity'
 import FindingCard from './FindingCard'
 
+const API_ORIGIN = 'http://localhost:8000'
+const screenshotUrl = (file) => (file.startsWith('http') ? file : `${API_ORIGIN}${file}`)
+
 export default function ReportView({ report }) {
   const groups = groupFindings(report.findings)
   return (
@@ -17,9 +20,9 @@ export default function ReportView({ report }) {
         {report.screenshots?.length > 0 && (
           <div style={{ display: 'flex', gap: 12, marginTop: 16, flexWrap: 'wrap' }}>
             {report.screenshots.map((s, i) => (
-              <a key={i} href={s.file} target="_blank" rel="noreferrer">
+              <a key={i} href={screenshotUrl(s.file)} target="_blank" rel="noreferrer">
                 <img
-                  src={s.file}
+                  src={screenshotUrl(s.file)}
                   alt={`screenshot ${i + 1}`}
                   style={{
                     border: '1px solid var(--border)',
