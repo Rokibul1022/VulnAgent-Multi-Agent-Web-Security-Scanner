@@ -14,6 +14,9 @@ from agents._common import run_capture
 CHROME_PATHS = [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     "/Applications/Chromium.app/Contents/MacOS/Chromium",
+    "/usr/bin/chromium",
+    "/usr/bin/chromium-browser",
+    "/usr/bin/google-chrome",
 ]
 
 
@@ -42,7 +45,8 @@ class ScreenshotAgent:
             await context.emit_agent(self.name, f"capturing {url}")
             found, _, _, _ = await run_capture(
                 [
-                    chrome, "--headless=new", "--disable-gpu", "--hide-scrollbars",
+                    chrome, "--headless=new", "--no-sandbox", "--disable-gpu",
+                    "--disable-dev-shm-usage", "--hide-scrollbars",
                     "--window-size=1280,800", "--virtual-time-budget=3000",
                     f"--screenshot={path}", url,
                 ],
