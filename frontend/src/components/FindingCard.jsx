@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { sevColor } from '../lib/severity'
+import { apiUrl } from '../config'
 
 const VERDICTS = [
   { key: 'true_positive', label: 'True positive' },
@@ -15,7 +16,7 @@ export default function FindingCard({ finding, jobId }) {
     if (sent) return
     setSent(verdict)
     try {
-      await fetch('http://localhost:8000/feedback', {
+      await fetch(apiUrl('/feedback'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

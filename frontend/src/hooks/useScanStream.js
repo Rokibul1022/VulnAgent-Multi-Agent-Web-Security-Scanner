@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { fetchReport } from '../api'
+import { apiUrl } from '../config'
 
 export default function useScanStream(jobId, onReport) {
   const [stages, setStages] = useState([])
@@ -9,7 +10,7 @@ export default function useScanStream(jobId, onReport) {
 
   useEffect(() => {
     if (!jobId) return
-    const es = new EventSource(`http://localhost:8000/scan/${jobId}/stream`)
+    const es = new EventSource(apiUrl(`/scan/${jobId}/stream`))
     const handle = (e) => {
       let data = {}
       try {

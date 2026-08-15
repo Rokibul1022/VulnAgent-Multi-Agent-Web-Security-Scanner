@@ -1,15 +1,15 @@
-"""Groq-powered triage agent (agent.md §4.5).
+"""LLM-powered triage agent (agent.md §4.5).
 
 Dedupes, re-ranks, and writes plain-English hints. Batches per category to keep
-prompts small. If Groq fails (all keys exhausted / API error), falls back to
-the deterministic dedupe so a scan never hangs.
+prompts small. If the LLM call fails (all keys exhausted / API error), falls
+back to the deterministic dedupe so a scan never hangs.
 """
 
 import asyncio
 import json
 
 from models import Finding
-from llm.groq_client import triage_findings
+from llm.llm_client import triage_findings
 from llm.prompts import build_recon_context
 
 VALID_SEVERITIES = {"info", "low", "medium", "high", "critical"}
@@ -59,7 +59,7 @@ class TriageAgent:
             if isinstance(result, Exception):
                 await context.emit_agent(
                     self.name,
-                    f"Groq triage failed for {category} ({result}) — keeping raw findings",
+                    f"LLM triage failed for {category} ({result}) — keeping raw findings",
                 )
                 triaged.extend(items)
                 continue
@@ -83,7 +83,7 @@ class TriageAgent:
 
 
 async def _call_triage(payload: str, recon_ctx: str, query: str) -> dict:
-    # run the (blocking) Groq call in a thread so the event loop stays responsive
+    # run the (blocking) LLM call in a thread so the event loop stays responsive
     import asyncio
 
     memory_ctx = await asyncio.to_thread(_memory_context, query)

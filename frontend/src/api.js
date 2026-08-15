@@ -1,6 +1,7 @@
 import axios from 'axios'
+import { API_ORIGIN } from './config'
 
-const API = axios.create({ baseURL: 'http://localhost:8000' })
+const API = axios.create({ baseURL: API_ORIGIN })
 
 export async function startScan({ url, authorizationConfirmed, scanMode }) {
   const { data } = await API.post('/scan', {

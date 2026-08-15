@@ -2,7 +2,7 @@
 
 > 20 AI agents scan and triage websites in minutes: mapping subdomains, ports, and WAFs,
 > then probing headers, TLS, CORS, CMS, and injection points via nuclei, testssl, ffuf, ZAP,
-> and sqlmap. A Groq triage agent prioritizes findings, boosted by RAG memory that recalls
+> and sqlmap. An LLM triage agent prioritizes findings, boosted by RAG memory that recalls
 > past reports and analyst feedback. Plain-English summaries make results actionable.
 
 VulnAgent is an autonomous, multi-agent web security scanning platform. A swarm of
@@ -28,7 +28,7 @@ Events.
 - **Two scan modes**:
   - `light` — ~1 minute, polite, high-value checks (ideal for a quick health check).
   - `full` — sequential, deeper, active tooling (nmap `-p-`, amass, sqlmap, large wordlists).
-- **LLM triage** via Groq that dedupes and ranks findings, then writes plain-English
+- **LLM triage** that dedupes and ranks findings, then writes plain-English
   explanations and remediation hints.
 - **RAG memory** (Chroma + SQLite): retrieval-augmented triage that recalls prior analyst
   verdicts and uploaded policy documents to keep results consistent and informed.
@@ -92,7 +92,7 @@ Events.
 | Scanning | `scan_zap` | OWASP ZAP active scan (Docker, **full only**) |
 | Scanning | `scan_secrets` | Secret/key detection in exposed content |
 | Scanning | `scan_sqlmap` | SQL injection detection (**full only**, never exploits) |
-| Triage | `triage` | Groq LLM: dedupe, prioritize, explain + RAG context |
+| Triage | `triage` | LLM: dedupe, prioritize, explain + RAG context |
 | Report | `report` | Assembles findings, risk score, executive summary, top risks |
 
 ### Anti-false-positive safeguards
@@ -115,7 +115,7 @@ Events.
 | Backend | Python 3.11+, FastAPI, httpx, asyncio |
 | Frontend | React 19, Vite 8, plain CSS |
 | Realtime | Server-Sent Events (sse-starlette) |
-| LLM | Groq (`openai/gpt-oss-120b` default) |
+| LLM | LLM (`openai/gpt-oss-120b` default) |
 | Memory | Chroma (vector store) + SQLite (source of truth) |
 | Tooling | nuclei, testssl, ffuf, nmap, sqlmap, amass, wafw00f, headless Chrome, ZAP (Docker) |
 
@@ -145,7 +145,7 @@ docker pull zaproxy/zap-stable
 nuclei -update-templates
 ```
 
-- **A Groq API key** — used for triage. Get one at <https://console.groq.com>.
+- **An LLM API key** — used for triage.
 
 ---
 
@@ -168,8 +168,8 @@ cp .env.example .env   # if present, otherwise create backend/.env
 
 ```bash
 # backend/.env
-GROQ_API_KEYS=your_groq_key_here            # comma-separated for round-robin
-GROQ_MODEL=openai/gpt-oss-120b
+LLM_API_KEYS=your_llm_api_keys_here          # comma-separated for round-robin
+LLM_MODEL=openai/gpt-oss-120b
 ```
 
 Run the API:
@@ -200,14 +200,42 @@ Open <http://localhost:5173> (Vite picks another port if 5173 is taken). The fro
 
 ---
 
+## Deploying
+
+### Backend on Render
+
+1. Push this repo to GitHub and create a **New Web Service** in Render, pointing at the repo.
+2. Render reads `backend/render.yaml` for the service config, or configure manually:
+   - **Root Directory:** `backend`
+   - **Build:** `pip install -r requirements.txt`
+   - **Start:** `uvicorn main:app --host 0.0.0.0 --port $PORT`
+   - **Runtime:** Python 3.11+
+3. Add the environment variable `LLM_API_KEYS` (comma-separated keys) — never commit keys.
+   Optionally set `LLM_MODEL`.
+4. Note the deployed URL, e.g. `https://your-backend.onrender.com`.
+
+> On Render, external tools (nuclei, testssl, ffuf, nmap, sqlmap, Chrome) are **not** installed,
+> so the tool-based agents gracefully report "not found" and skip. The LLM triage agent still
+> works. For full tooling, deploy on a machine where the binaries are installed.
+
+### Frontend on Vercel
+
+1. Import the repo in Vercel (framework auto-detected as **Vite**).
+2. Set the environment variable `VITE_API_ORIGIN` to your backend URL, e.g.
+   `https://your-backend.onrender.com`.
+3. Deploy — the app calls the backend from `VITE_API_ORIGIN` and the SSE stream, feedback
+   endpoint, and screenshot URLs all use the same origin.
+
+---
+
 ## Configuration
 
 Environment variables (backend `.env`):
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `GROQ_API_KEYS` | — | Comma-separated Groq API keys (round-robin) |
-| `GROQ_MODEL` | `openai/gpt-oss-120b` | Groq model used for triage |
+| `LLM_API_KEYS` | — | Comma-separated LLM API keys (round-robin) |
+| `LLM_MODEL` | `openai/gpt-oss-120b` | LLM model used for triage |
 | `ZAP_DOCKER_IMAGE` | `zaproxy/zap-stable` | ZAP container image |
 | `NUCLEI_TEMPLATES_PATH` | `~/nuclei-templates` | nuclei template location |
 | `WORDLIST_COMMON` / `LIGHT` / `MICRO` | `data/wordlists/*.txt` | ffuf wordlists per mode |
@@ -271,7 +299,7 @@ Environment variables (backend `.env`):
 ├── backend/
 │   ├── agents/            # 20 agent modules (surface_*, recon, discovery_*, scan_*, triage)
 │   ├── data/wordlists/    # ffuf wordlists (micro/light/common)
-│   ├── llm/               # groq_client.py, prompts.py
+│   ├── llm/               # llm_client.py, prompts.py
 │   ├── memory/            # feedback_store.py (SQLite + Chroma)
 │   ├── storage/           # runtime: jobs.py, memory.db, chroma/, screenshots/
 │   ├── config.py          # env-driven configuration

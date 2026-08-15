@@ -1,4 +1,4 @@
-"""Prompt content for the Groq triage agent (agent.md §4.5)."""
+"""Prompt content for the LLM triage agent (agent.md §4.5)."""
 
 TRIAGE_SYSTEM_PROMPT = """You are the triage analyst for an authorized web vulnerability scanner. \
 Your job is to turn raw output from multiple scanning tools into a clean, ranked, \

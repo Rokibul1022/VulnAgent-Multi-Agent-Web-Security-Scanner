@@ -1,4 +1,8 @@
-"""Groq client with multi-key rotation/failover. See agent.md §6."""
+"""LLM client with multi-key rotation/failover.
+
+Provider-agnostic entry point: reads keys from config and calls the LLM
+provider SDK. Any provider failure degrades gracefully via fallback.
+"""
 
 import os
 import time
@@ -11,10 +15,10 @@ from groq import RateLimitError, APIStatusError
 import config
 
 
-class GroqKeyPool:
+class LLMKeyPool:
     def __init__(self, keys: list[str]):
         if not keys:
-            raise ValueError("No Groq API keys configured")
+            raise ValueError("No LLM API keys configured")
         self._clients = [Groq(api_key=k) for k in keys]
         self._cycle = itertools.cycle(range(len(self._clients)))
         self._current = next(self._cycle)
@@ -40,14 +44,14 @@ class GroqKeyPool:
                 # non-rate-limit API error (bad request, server error, etc.)
                 raise
         raise RuntimeError(
-            f"All Groq keys exhausted after {max_attempts} attempts"
+            f"All LLM keys exhausted after {max_attempts} attempts"
         ) from last_err
 
 
-def get_pool() -> GroqKeyPool | None:
-    if not config.GROQ_API_KEYS:
+def get_pool() -> LLMKeyPool | None:
+    if not config.LLM_API_KEYS:
         return None
-    return GroqKeyPool(config.GROQ_API_KEYS)
+    return LLMKeyPool(config.LLM_API_KEYS)
 
 
 _pool = get_pool()
@@ -56,11 +60,11 @@ _pool = get_pool()
 def triage_findings(findings_json: str, recon_context: str, memory_context: str = "") -> dict:
     """One triage call. Returns parsed JSON dict. Raises if the pool fails."""
     if _pool is None:
-        raise RuntimeError("GROQ_API_KEYS not configured")
+        raise RuntimeError("LLM_API_KEYS not configured")
     from llm.prompts import TRIAGE_SYSTEM_PROMPT
 
     completion = _pool.chat_completion(
-        model=config.GROQ_MODEL,
+        model=config.LLM_MODEL,
         response_format={"type": "json_object"},
         messages=[
             {

@@ -4,10 +4,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-GROQ_API_KEYS = [
-    k.strip() for k in os.getenv("GROQ_API_KEYS", "").split(",") if k.strip()
+LLM_API_KEYS = [
+    k.strip() for k in os.getenv("LLM_API_KEYS", "").split(",") if k.strip()
 ]
-GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+LLM_MODEL = os.getenv("LLM_MODEL", "openai/gpt-oss-120b")
 ZAP_DOCKER_IMAGE = os.getenv("ZAP_DOCKER_IMAGE", "zaproxy/zap-stable")
 NUCLEI_TEMPLATES_PATH = os.getenv(
     "NUCLEI_TEMPLATES_PATH", os.path.expanduser("~/nuclei-templates")

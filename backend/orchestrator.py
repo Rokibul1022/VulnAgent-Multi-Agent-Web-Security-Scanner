@@ -1,7 +1,7 @@
 """Scan orchestration.
 
 Milestone 2: runs the real recon + header-check agents (pure Python) and
-assembles a report. Triage is a deterministic dedupe pass until the Groq
+assembles a report. Triage is a deterministic dedupe pass until the LLM
 triage agent lands (milestone 4).
 """
 
@@ -161,7 +161,7 @@ async def _run_stage(context, name, label, agent_list, concurrent=True):
 
 
 async def _triage_pass(context):
-    """Deterministic dedupe + same-surface filter for now; Groq re-rank
+    """Deterministic dedupe + same-surface filter for now; LLM re-rank
     lands in milestone 4."""
     allowed = _allowed_hosts(context)
     seen = set()

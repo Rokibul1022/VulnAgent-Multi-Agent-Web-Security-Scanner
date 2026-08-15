@@ -1,7 +1,7 @@
 import { groupFindings } from '../lib/severity'
 import FindingCard from './FindingCard'
+import { API_ORIGIN } from '../config'
 
-const API_ORIGIN = 'http://localhost:8000'
 const screenshotUrl = (file) => (file.startsWith('http') ? file : `${API_ORIGIN}${file}`)
 
 export default function ReportView({ report }) {
