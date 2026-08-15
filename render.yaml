@@ -2,11 +2,10 @@ services:
   # VulnAgent backend blueprint
   - type: web
     name: vuln-agent-backend
-    runtime: python
+    runtime: docker
     plan: free
-    buildCommand: apt-get update && apt-get install -y --no-install-recommends chromium && pip install -r requirements.txt
-    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     rootDir: backend
+    dockerfilePath: Dockerfile
     healthCheckPath: /
     envVars:
       - key: LLM_API_KEYS
