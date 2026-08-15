@@ -1,4 +1,5 @@
 services:
+  # VulnAgent backend blueprint
   - type: web
     name: vuln-agent-backend
     runtime: python
